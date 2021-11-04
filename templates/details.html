@@ -5,13 +5,11 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="../../문화로%20-%20상세페이지_files/reset.css">
-    <link rel="stylesheet" href="../../문화로%20-%20상세페이지_files/style.css">
-    <link rel="stylesheet" href="../../문화로%20-%20상세페이지_files/detail.css">
-    <script src="../../문화로%20-%20상세페이지_files/jquery-3.1.1.min.js"></script>
-    <script type="text/javascript" src="../../문화로%20-%20상세페이지_files/jquery.cookie.min.js"></script>
-    <script type="text/javascript" src="../../문화로%20-%20상세페이지_files/jquery.cookie.min.js"></script>
-
+    <link rel="stylesheet" href="/Users/sam/Desktop/문화로 - 상세페이지_files/reset.css">
+    <link rel="stylesheet" href="/Users/sam/Desktop/문화로 - 상세페이지_files/style.css">
+    <link rel="stylesheet" href="/Users/sam/Desktop/문화로 - 상세페이지_files/detail.css">
+    <script src="/Users/sam/Desktop/문화로 - 상세페이지_files/jquery-3.1.1.min.js"></script>
+    <script type="text/javascript" src="/Users/sam/Desktop/문화로 - 상세페이지_files/jquery.cookie.min.js"></script>
     <title>문화로 - 상세페이지</title>
 
     <style>
@@ -398,11 +396,12 @@
                                     display: block;
                                     width: 520px;
                                 }
-                                    .css-Title {
+
+                                .css-Title {
                                     font-family: 'Do Hyeon', sans-serif;
                                     font-size: 45px;
                                 }
-                                }
+                            }
 
 
                             @media (min-width: 1023px) {
@@ -590,6 +589,7 @@
                                 id="input-comment"
                                 placeholder="리뷰를 적어주세요!"
                         ></textarea>
+
         <div class="write-review__control">
             <input
                     id="ReviewSubmit"
@@ -605,8 +605,7 @@
         <div class="review">
             <li>
                                 <span class="review-text"
-                                >{{ review["comment"] }}</span
-                                >
+                                >{{ review["comment"] }}</span>
                 <span>{{ review["user_id"] }}</span>
             </li>
             <button class="ReviewDelete">
@@ -656,7 +655,73 @@
         Array.from(REVIEW_DELETE).forEach(function (DELETE) {
             DELETE.addEventListener("click", delete_comment);
         });
+
+
+function create_comment() {
+    const re = /[0-9]/;
+    const url = window.location.pathname;
+
+    const movie_id = re.exec(url)[0];
+
+    const comment = $("#input-comment").val();
+    const token = $.cookie("mytoken");
+
+    $.ajax({
+        type: "POST",
+        url: `/movie/${movie_id}/comment`,
+        data: {
+            comment_give: comment,
+        },
+        beforeSend: function (xhr) {
+            xhr.setRequestHeader("Authorization", "bearer " + token);
+        },
+        success: function (response) {
+            if (response["result"] == "success") {
+                alert(response["msg"]);
+                location.reload();
+            } else {
+                alert(response["msg"]);
+            }
+        },
+    });
+}
+
+function delete_comment(e) {
+    let comment_give = "";
+    if (e.target.tagName == "BUTTON") {
+        const parent = e.target.parentNode;
+        comment_give =
+            parent.firstChild.nextSibling.firstChild.nextSibling.textContent;
+    } else if (e.target.tagName == "svg") {
+        comment_give =
+            e.target.parentNode.parentNode.firstChild.nextSibling.firstChild
+                .nextSibling.textContent;
+    }
+
+    const re = /[0-9]/;
+    const url = window.location.pathname;
+    const movie_id = re.exec(url)[0];
+
+    $.ajax({
+        type: "POST",
+        url: `/movie/${movie_id}/comment/delete`,
+        data: {
+            movie_give: movie_id,
+            comment_give: comment_give,
+        },
+        success: function (response) {
+            if (response["result"] == "success") {
+                alert(response["msg"]);
+                location.reload();
+            } else if (response["result"] == "fail") {
+                alert(response["msg"]);
+            }
+        },
+    });
+}
 </script>
+
+
 
 </body>
 </html>

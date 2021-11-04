@@ -1,17 +1,26 @@
-
-import jwt
-
-from flask_bcrypt import Bcrypt
 from pymongo import MongoClient
-from flask import Flask, render_template, jsonify, request, redirect
-
-client = MongoClient('localhost', 27017)
-db = client.mini_project
+import jwt
+import datetime
+import hashlib
+from flask import Flask, render_template, jsonify, request, redirect, url_for
+from werkzeug.utils import secure_filename
+from datetime import datetime, timedelta
 
 app = Flask(__name__)
-SECRET_KEY = "SPARTA"
-bcrypt = Bcrypt(app)
 
+app.config["TEMPLATES_AUTO_RELOAD"] = True
+app.config['UPLOAD_FOLDER'] = "../static/profile_pics"
+
+SECRET_KEY = 'SPARTA'
+
+client = MongoClient('localhost', 27017)
+db = client.hanghae99_chapter1
+
+
+# index .main
+@app.route('/')
+def details():
+    return render_template('details.html')
 
 @app.route("/movie/<movie_id>/comment", methods=["POST"])
 def comment(movie_id):
